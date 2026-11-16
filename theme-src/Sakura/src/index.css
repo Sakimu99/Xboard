@@ -1,0 +1,183 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * 粉白配色（固定亮色）：奶白底 + 樱花粉主色，卡片为半透明白玻璃
+ * --primary 为主色，--primary-2 为渐变的第二色（更浅的粉）
+ */
+:root {
+  color-scheme: light;
+  --radius: 0.875rem;
+  --background: oklch(0.985 0.008 355);
+  --foreground: oklch(0.33 0.045 355);
+  --card: oklch(1 0 0 / 0.72);
+  --card-foreground: oklch(0.33 0.045 355);
+  --popover: oklch(1 0 0 / 0.94);
+  --popover-foreground: oklch(0.33 0.045 355);
+  --primary: oklch(0.7 0.17 358);
+  --primary-2: oklch(0.8 0.11 8);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.025 355 / 0.85);
+  --secondary-foreground: oklch(0.38 0.06 355);
+  --muted: oklch(0.955 0.018 355 / 0.75);
+  --muted-foreground: oklch(0.56 0.04 355);
+  --accent: oklch(0.94 0.035 355 / 0.75);
+  --accent-foreground: oklch(0.38 0.06 355);
+  --destructive: oklch(0.62 0.2 22);
+  --success: oklch(0.62 0.14 160);
+  --warning: oklch(0.7 0.15 60);
+  --border: oklch(0.9 0.03 355 / 0.75);
+  --input: oklch(0.88 0.035 355 / 0.85);
+  --ring: var(--primary);
+  --sidebar: oklch(1 0 0 / 0.66);
+  --scrim: oklch(0.99 0.008 355 / 0.7);
+}
+
+@theme inline {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-2: var(--primary-2);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-scrim: var(--scrim);
+
+  --animate-aurora: aurora 22s ease-in-out infinite alternate;
+  --animate-shimmer: shimmer 6s linear infinite;
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes aurora {
+    0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+    50% { transform: translate3d(8%, -6%, 0) scale(1.15) rotate(12deg); }
+    100% { transform: translate3d(-6%, 8%, 0) scale(0.95) rotate(-8deg); }
+  }
+  @keyframes shimmer {
+    to { background-position: 200% center; }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+}
+
+/* 主色渐变文字（带流光） */
+@utility text-gradient {
+  background-image: linear-gradient(100deg, var(--primary), var(--primary-2), var(--primary));
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bg-gradient-brand {
+  background-image: linear-gradient(120deg, var(--primary), var(--primary-2));
+}
+
+/* 卡片跟随鼠标的光斑，配合 lib/effects.ts 写入 --mx / --my */
+@utility spotlight {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklch, var(--primary) 16%, transparent), transparent 60%);
+  }
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scrollbar-color: color-mix(in oklch, var(--primary) 40%, transparent) transparent;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--primary) 35%, transparent);
+  }
+}
+
+/* 点击星星特效 */
+.click-spark {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--primary);
+  text-shadow: 0 0 8px var(--primary);
+  animation: spark 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes spark {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
+  to { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.1) rotate(var(--rot)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 文档内容排版 */
+.markdown {
+  font-size: 0.925rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+  & > * + * { margin-top: 0.9em; }
+  & h1, & h2, & h3, & h4 { font-weight: 700; line-height: 1.35; margin-top: 1.4em; }
+  & h1 { font-size: 1.5rem; }
+  & h2 { font-size: 1.25rem; padding-bottom: 0.3em; border-bottom: 1px solid var(--border); }
+  & h3 { font-size: 1.1rem; }
+  & a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+  & ul { list-style: disc; padding-left: 1.4em; }
+  & ol { list-style: decimal; padding-left: 1.4em; }
+  & li + li { margin-top: 0.3em; }
+  & img { max-width: 100%; border-radius: var(--radius); }
+  & code { font-family: ui-monospace, monospace; font-size: 0.85em; padding: 0.15em 0.4em; border-radius: 6px; background: var(--muted); }
+  & pre { padding: 1em; border-radius: var(--radius); background: var(--muted); overflow-x: auto; }
+  & pre code { padding: 0; background: none; }
+  & blockquote { border-left: 3px solid var(--primary); padding-left: 1em; color: var(--muted-foreground); }
+  & table { width: 100%; border-collapse: collapse; }
+  & th, & td { border: 1px solid var(--border); padding: 0.45em 0.7em; }
+  & .v2board-no-access { padding: 0.8em 1em; border-radius: var(--radius); background: color-mix(in oklch, var(--warning) 15%, transparent); color: var(--warning); }
+}
